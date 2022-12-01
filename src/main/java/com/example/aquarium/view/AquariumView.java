@@ -45,8 +45,9 @@ public class AquariumView {
         Platform.runLater(() -> {
             this.tankView.getChildren().removeIf(node -> node instanceof FishView);
             for (int i = 0; i < tankView.getAquarium().getNbFish(); i++) {
-                FishView pcg = new FishView(new Fish());
-                this.tankView.getChildren().add(pcg);
+                FishView fishView = new FishView(new Fish());
+                fishView.playRandomMovement();
+                this.tankView.getChildren().add(fishView);
             }
         });
     }
