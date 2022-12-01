@@ -5,6 +5,7 @@ import com.example.aquarium.model.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -16,7 +17,7 @@ import java.util.Random;
 public class FishView extends ImageView {
     private final Timeline timeline;
     private final Random random = new Random();
-    private final Position initPosition;
+    private Position initPosition;
 
     public FishView(Fish fish) {
 
@@ -36,6 +37,16 @@ public class FishView extends ImageView {
         timeline = new Timeline();
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.setAutoReverse(true);
+
+        this.layoutXProperty().addListener(observable -> {
+            if (checkFishIntersection()) {
+                timeline.stop();
+                initPosition = getRandomPosition();
+                this.setLayoutX(initPosition.getX());
+                this.setLayoutY(initPosition.getY());
+                playRandomMovement();
+            }
+        });
     }
 
     public Position playRandomMovement() {
@@ -76,5 +87,21 @@ public class FishView extends ImageView {
         return p;
     }
 
+    /**
+     * @return true if two fish collide
+     */
+    private boolean checkFishIntersection() {
+        boolean collisionDetected = false;
+        if (this.getParent() != null) {
+            for (Node child : this.getParent().getChildrenUnmodifiable()) {
+                if (child instanceof FishView && !child.equals(this)) {
+                    if (this.getBoundsInParent().intersects(child.getBoundsInParent())) {
+                        collisionDetected = true;
+                    }
+                }
+            }
+        }
+        return collisionDetected;
+    }
 }
 
